@@ -1,6 +1,6 @@
-package time;
+package main.java.ca.concordia.time;
 
-import ca.concordia.echo.BlockingEchoServer;
+import main.java.ca.concordia.echo.BlockingEchoServer;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.slf4j.Logger;

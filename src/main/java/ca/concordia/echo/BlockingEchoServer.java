@@ -1,4 +1,4 @@
-package echo;
+package main.java.ca.concordia.echo;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

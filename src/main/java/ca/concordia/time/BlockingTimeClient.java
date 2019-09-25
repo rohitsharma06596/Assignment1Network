@@ -1,4 +1,4 @@
-package time;
+package main.java.ca.concordia.time;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

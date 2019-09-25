@@ -1,4 +1,4 @@
-package ca.concordia.echo;
+package echo;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

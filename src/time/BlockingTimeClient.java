@@ -1,4 +1,4 @@
-package ca.concordia.time;
+package time;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

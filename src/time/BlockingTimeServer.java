@@ -1,4 +1,4 @@
-package ca.concordia.time;
+package time;
 
 import ca.concordia.echo.BlockingEchoServer;
 import joptsimple.OptionParser;

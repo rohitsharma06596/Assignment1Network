@@ -8,16 +8,23 @@ public class HTTPCClient {
 
     public static void main(String[] args) throws IOException {
 
-        MyGETRequest();
-        MyPOSTRequest();
+        String url = "http://httpbin.org/get?course=networking&assignment=1";
+        GETRequest(url);
+        POSTRequest();
     }
 
-    public static void MyGETRequest() throws IOException {
-        URL urlForGetRequest = new URL("http://httpbin.org/get?course=networking&assignment=1");
+    public static void GETRequest(String url) throws IOException {
+        //Creating connection for httpc
+        URL urlForGetRequest = new URL(url);
         String readLine = null;
         HttpURLConnection conection = (HttpURLConnection) urlForGetRequest.openConnection();
         conection.setRequestMethod("GET");
-        //conection.setRequestProperty("userId", "a1bcdef"); // set userId its a sample here
+        //conection.setRequestProperty("userId", "a1bcdef");
+
+        //Adding request parameters
+
+
+        //Reading the response code
         int responseCode = conection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(
@@ -27,14 +34,14 @@ public class HTTPCClient {
                 response.append(readLine);
             } in .close();
             // print result
-            System.out.println("JSON String Result " + response.toString());
+            System.out.println(response.toString());
             //GetAndPost.POSTRequest(response.toString());
         } else {
             System.out.println("GET NOT WORKED");
         }
     }
 
-    public static void MyPOSTRequest() throws IOException {
+    public static void POSTRequest() throws IOException {
         final String POST_PARAMS = "{\n" + "\"userId\": 101,\r\n" +
                 "    \"id\": 101,\r\n" +
                 "    \"title\": \"Test Title\",\r\n" +
@@ -43,7 +50,7 @@ public class HTTPCClient {
         URL obj = new URL("http://httpbin.org/post");
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
         postConnection.setRequestMethod("POST");
-        postConnection.setRequestProperty("userId", "a1bcdefgh");
+        //postConnection.setRequestProperty("userId", "a1bcdefgh");
         postConnection.setRequestProperty("Content-Type", "application/json");
         postConnection.setDoOutput(true);
         OutputStream os = postConnection.getOutputStream();

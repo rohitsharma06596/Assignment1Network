@@ -1,11 +1,5 @@
-package main.java.ca.concordia.echo;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -14,9 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import static java.util.Arrays.asList;
-
-public class BlockingEchoClient {
+public class HTTPCClient {
 
     // readFully reads until the request is fulfilled or the socket is closed
     private static void readFully(SocketChannel socket, ByteBuffer buf, int size) throws IOException {
@@ -72,8 +64,8 @@ public class BlockingEchoClient {
 //
 //        SocketAddress endpoint = new InetSocketAddress(host, port);
 //        runClient(endpoint);
-        MyGETRequest();
-        //MyPOSTRequest();
+        //MyGETRequest();
+        MyPOSTRequest();
     }
 
     public static void MyGETRequest() throws IOException {
@@ -104,7 +96,7 @@ public class BlockingEchoClient {
                 "    \"title\": \"Test Title\",\r\n" +
                 "    \"body\": \"Test Body\"" + "\n}";
         System.out.println(POST_PARAMS);
-        URL obj = new URL("http://httpbin.org/get?course=networking&assignment=1");
+        URL obj = new URL("http://httpbin.org/post");
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
         postConnection.setRequestMethod("POST");
         postConnection.setRequestProperty("userId", "a1bcdefgh");
@@ -132,4 +124,3 @@ public class BlockingEchoClient {
         }
     }
 }
-

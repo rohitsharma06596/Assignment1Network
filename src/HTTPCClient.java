@@ -16,7 +16,7 @@ public class HTTPCClient {
 
         String url = "http://httpbin.org/get?course=networking&assignment=1";
         String url1 = "http://httpbin.org/post";
-        //GETRequest(url);
+        GETRequest(url);
         POSTRequest(url1);
     }
 
@@ -37,13 +37,13 @@ public class HTTPCClient {
 
 
         //Adding query parameters
-//        Map<String, String> parameters = new HashMap<String, String>();
-//        parameters.put("q", "world");
-//        connection.setDoOutput(true);
-//        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-//        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-//        out.flush();
-//        out.close();
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("q", "world");
+        connection.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
 
 
 

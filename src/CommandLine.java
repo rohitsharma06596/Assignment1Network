@@ -13,23 +13,24 @@ public class CommandLine {
 
     public static void main(String args[]){
         String temp = "Default";
-        while(true) {
             try {
                 DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
                 Date dateObj = new Date();
-                System.out.println("\n");
-                System.out.print(df.format(dateObj)+" LocalComp-HTTPCPrompt:~ ");
                 byte[] b = new byte[1024];
+                System.out.print(df.format(dateObj)+" LocalComp-HTTPCPrompt:~ ");
                 for (int r; (r = System.in.read(b)) != -1; ) {
                     String buffer = new String(b, 0, r);
-                    System.out.println("read: " + buffer);
                     parse(buffer);
+                    System.out.println("read: " + buffer);
+                    DateFormat dfnew = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+                    Date dateObjnew = new Date();
+                    System.out.println("\n");
+                    System.out.print(dfnew.format(dateObjnew)+" LocalComp-HTTPCPrompt:~ ");
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
     }
 
 }

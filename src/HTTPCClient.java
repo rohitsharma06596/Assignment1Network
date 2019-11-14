@@ -6,12 +6,14 @@
  * our new web request generation protocal modelled using standard HTTP with customized
  * selection of its features. It is made interactive by a Command Line application
  *
- * @author Rohit Sharma, Ayush Lamichane
- * @since 30-09-2019
+ * @author Rohit Sharma, Aayush Lamichhane
+ * @since 09-11-2019
  */
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -129,8 +131,8 @@ public class HTTPCClient {
                 System.out.println("GET Response Code :  " + responseCode);
                 System.out.println("GET Response Message : " + connection.getResponseMessage());
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()));
+                    InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+                    BufferedReader in = new BufferedReader(isr);
                     while ((readLine = in.readLine()) != null) {
                         response.append(readLine);
                         response.append("\n");
@@ -369,5 +371,147 @@ public class HTTPCClient {
                 System.out.println("SERVER TIMED OUT");
             }
         }
+    public static void FILEGETRequest() throws IOException {
+
+        /**Creating connection and request for httpc*/
+
+//        String readLine = null;
+//        URL urlForGetRequest = new URL(parsedData.get("URL"));
+//        HttpURLConnection connection = (HttpURLConnection) urlForGetRequest.openConnection();
+//        connection.setRequestMethod("GET");
+//        connection.setInstanceFollowRedirects(true);
+        String host = "http://localhost";
+        int port = 8080;
+        InetAddress address = InetAddress.getByName(host);
+        Socket socket = new Socket(address, port);
+        try {
+
+            OutputStream os = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);
+            BufferedWriter bw = new BufferedWriter(osw);
+
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+
+            if (!parsedData.containsKey("file")) {
+
+                //Send the message to the server
+
+                String number = "GETDirectory";
+
+                String sendMessage = number + "\n";
+                bw.write(sendMessage);
+                bw.flush();
+                System.out.println("Message sent to the server : " + sendMessage);
+                String finalMessage = " ";
+                String message;
+                while((message = br.readLine()) != null){
+                    finalMessage += message;
+                    finalMessage += "\n";
+                }
+                System.out.println("Your directory is below : " + finalMessage);
+            } else {
+
+                String number = "GET"+parsedData.get("file") + ":" + "FILE";
+
+                String sendMessage = number + "\n";
+                bw.write(sendMessage);
+                bw.flush();
+                System.out.println("Message sent to the server : " + sendMessage);
+                String message = br.readLine();
+                System.out.println("Final response message : " + message);
+            }
+        }
+        catch (Exception exception)
+        {
+            exception.printStackTrace();
+        }
+        finally
+        {
+            //Closing the socket
+            try
+            {
+                socket.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void FILEPOSTRequest() throws IOException {
+
+        String host = "http://localhost";
+        int port = 8080;
+        InetAddress address = InetAddress.getByName(host);
+        Socket socket = new Socket(address, port);
+        try {
+
+            OutputStream os = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);
+            BufferedWriter bw = new BufferedWriter(osw);
+
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+
+            if (!parsedData.containsKey("file")) {
+
+                //Send the message to the server
+
+                String number = "POST cannot be used to make listing requests";
+
+                String sendMessage = number + "\n";
+                bw.write(sendMessage);
+                bw.flush();
+                System.out.println("Message sent to the server : " + sendMessage);
+                String finalMessage = " ";
+                String message;
+                while((message = br.readLine()) != null){
+                    finalMessage += message;
+                    finalMessage += "\n";
+                }
+                System.out.println("Your directory is below : " + finalMessage);
+            } else {
+                if (!parsedData.containsKey("message")){
+                    System.out.println("Please enter an appropriate contents to write into the file");
+                }
+                else{
+                    String number = "POST"+parsedData.get("file") + ":" + "FILE"+";"+ parsedData.get("message") +
+                            ":"+"MESSAGE";
+
+                    String sendMessage = number + "\n";
+                    bw.write(sendMessage);
+                    bw.flush();
+                    System.out.println("Message sent to the server : " + sendMessage);
+                    String message = br.readLine();
+                    System.out.println("Final response message : " + message);
+                }
+
+
+            }
+        }
+        catch (Exception exception)
+        {
+            exception.printStackTrace();
+        }
+        finally
+        {
+            //Closing the socket
+            try
+            {
+                socket.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
 
 }

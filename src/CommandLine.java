@@ -12,6 +12,7 @@
  */
 
 import java.net.MalformedURLException;
+import java.sql.SQLOutput;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class CommandLine {
                 if(buffer.isEmpty()){
                     System.out.println("httpc is a curl-like application but supports HTTP protocol only.");
                     System.out.println("Usage:");
-                    System.out.println("    httpc command [arguments]");
+                    System.out.println("    httpc and httpfs command [arguments]");
                     System.out.println("The commands are:");
                     System.out.println("    get     executes a HTTP GET request and prints the response.");
                     System.out.println("    post    executes a HTTP POST request and prints the response.");
@@ -147,6 +148,61 @@ public class CommandLine {
                 System.out.println("Invalid request method");
                 return 0;
             }
+        }
+        else if((holder.equalsIgnoreCase("httpfs"))) {
+            parsedData.put("protocol", holder);
+            buffer = buffer.substring(buffer.indexOf(" ") + 1);
+            buffer.trim();
+            holder = buffer.substring(0, buffer.indexOf(" "));
+            if ((holder.equalsIgnoreCase("get") || holder.equalsIgnoreCase("post"))) {
+                parsedData.put("request", "file" + holder);
+                buffer = buffer.substring(buffer.indexOf(" "));
+                buffer = buffer.trim();
+            }
+            if (holder.equalsIgnoreCase("get")){
+                if (buffer.startsWith("/")) {
+                    if (buffer.equals("/")) {
+                        parsedData.put("URL", "http://localhost:8080");
+                        return 1;
+                    } else {
+                        parsedData.put("file", buffer.substring(1));
+                        parsedData.put("URL", "http://localhost:8080");
+                        return 1;
+                    }
+
+                } else {
+                    System.out.println("Invalid syntax");
+                }
+            }
+            else if(holder.equalsIgnoreCase("post")){
+                if (buffer.startsWith("/")) {
+                    if (buffer.equals("/")) {
+                        parsedData.put("URL", "http://localhost:8080");
+                        return 1;
+                    } else {
+                        buffer = buffer.substring(1);
+                        if(buffer.contains(" ")){
+                            parsedData.put("file", buffer.substring(0, buffer.indexOf(" ")));
+                            parsedData.put("URL", "http://localhost:8080");
+                            parsedData.put("message", buffer.substring(buffer.indexOf(" ")+1));
+                            return 1;
+                        }
+                        else{
+                            System.out.println("You are missing either the file name or the message in the syntax");
+                            return 0;
+                        }
+
+                    }
+
+                } else {
+                    System.out.println("Invalid syntax");
+                }
+            }
+            if(!parsedData.keySet().contains("URL")) {
+                parsedData.put("URL", buffer.substring(0, buffer.indexOf(" ")));
+                return 1;
+            }
+            return 0;
         }
         else{
             System.out.println("Invalid protocol");
@@ -656,8 +712,13 @@ public class CommandLine {
                             HTTPCClient.GETRequest();
                         } else if (parsedData.get("request").equalsIgnoreCase("post")) {
                             HTTPCClient.POSTRequest();
+                        } else if (parsedData.get("request").equalsIgnoreCase("fileget")) {
+                            HTTPCClient.FILEGETRequest();
+                        } else if (parsedData.get("request").equalsIgnoreCase("filepost")) {
+                            HTTPCClient.FILEPOSTRequest();
                         }
                     }
+
                     parsedData.clear();
                     System.out.print(dfnew.format(dateObjnew)+" LocalComp-HTTPCPrompt:~ ");
 

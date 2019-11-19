@@ -6,8 +6,9 @@ import java.util.Date;
 
 public class HTTPServer extends Thread{
 
+    ArrayList<String> filesOnHold = new ArrayList<String>();
     private ArrayList<String> listFiles =  new ArrayList<>();
-    ArrayList<String> allfiles  = new ArrayList<>();
+    private ArrayList<String> allfiles  = new ArrayList<>();
     private boolean verbose;
 
     public boolean isVerbose() {
@@ -116,7 +117,7 @@ public class HTTPServer extends Thread{
 
     }
 
-    public void ServeGETRequest(String number, StringBuilder response) throws IOException {
+    public void ServeGETRequest(String number, StringBuilder response) throws IOException, InterruptedException {
         System.out.println("Message received from client is " + number);
         System.out.println(" -------------------------------------------");
         System.out.println();
@@ -139,58 +140,65 @@ public class HTTPServer extends Thread{
 //            os.close();
             osw.close();
         }
-        else if(number.endsWith(":FILE")){
+        else if(number.endsWith(":FILE")) {
             OutputStream os = socket.getOutputStream();
             OutputStreamWriter osw = new OutputStreamWriter(os);
             BufferedWriter bw = new BufferedWriter(osw);
             System.out.println("Type 2");
-            File holder  = returnFile(number.substring(0, number.indexOf(":")));
-            if(holder == null){
-                if(entireDirectory("/Users/rohitsharma/IdeaProjects/Assignment1Network/src/ServerFileDir/"
-                        ,number.substring(0, number.indexOf(":")))) {
+            File holder = returnFile(number.substring(0, number.indexOf(":")));
+            while(true){
+                if(!filesOnHold.contains(holder.getName())) {
+                    filesOnHold.add(holder.getName());
+                    if (holder == null) {
+                        if (entireDirectory("/Users/rohitsharma/IdeaProjects/Assignment1Network/src/ServerFileDir/"
+                                , number.substring(0, number.indexOf(":")))) {
 
-                    String hope = "File is present in a directory which is out of your scope of access";
-                    if(isVerbose()){
-                        String temp = verboseContent();
-                        hope = temp + hope;
-                    }
-                    bw.write(hope);
-                    System.out.println("Message sent to the client is 2 " + hope);
-                }
-                else{
-                    String hope = "HTTPFS: ERROR 404 The file was not found";
-                    if(isVerbose()){
-                        String temp = verboseContent();
-                        hope = temp + hope;
-                    }
-                    bw.write(hope);
-                    System.out.println("Message sent to the client is 2 " + hope);
-                }
-            }
-            else{
-                if(holder.isFile()) {
-                    String hope = fileToString(holder);
-                    if (hope.isEmpty()) {
-                        hope = "HTTPFS :ERROR 0701 the file is empty";
-                        if(isVerbose()){
-                            String temp = verboseContent();
-                            hope = temp + hope;
+                            String hope = "File is present in a directory which is out of your scope of access";
+                            if (isVerbose()) {
+                                String temp = verboseContent();
+                                hope = temp + hope;
+                            }
+                            bw.write(hope);
+                            System.out.println("Message sent to the client is 2 " + hope);
+                        } else {
+                            String hope = "HTTPFS: ERROR 404 The file was not found";
+                            if (isVerbose()) {
+                                String temp = verboseContent();
+                                hope = temp + hope;
+                            }
+                            bw.write(hope);
+                            System.out.println("Message sent to the client is 2 " + hope);
                         }
-                        bw.write(hope);
-                        System.out.println("Message sent to the client is 2 " + hope);
                     } else {
-                        if(isVerbose()){
-                            String temp = verboseContent();
-                            hope = temp + hope;
+                        if (holder.isFile()) {
+                            String hope = fileToString(holder);
+                            if (hope.isEmpty()) {
+                                hope = "HTTPFS :ERROR 0701 the file is empty";
+                                if (isVerbose()) {
+                                    String temp = verboseContent();
+                                    hope = temp + hope;
+                                }
+                                bw.write(hope);
+                                System.out.println("Message sent to the client is 2 " + hope);
+                            } else {
+                                if (isVerbose()) {
+                                    String temp = verboseContent();
+                                    hope = temp + hope;
+                                }
+                                bw.write(hope);
+                                System.out.println("Message sent to the client is 2 " + hope);
+                            }
+                        } else {
+                            bw.write("The selected file is a directory you are not authorized access to it");
+                            System.out.println("Message sent to the client is 2 " + "The selected file is a directory you " +
+                                    "are not authorized access to it");
                         }
-                        bw.write(hope);
-                        System.out.println("Message sent to the client is 2 " + hope);
                     }
+                    filesOnHold.remove(holder.getName());
+                    break;
                 }
                 else{
-                    bw.write("The selected file is a directory you are not authorized access to it");
-                    System.out.println("Message sent to the client is 2 " + "The selected file is a directory you " +
-                            "are not authorized access to it");
+                    wait(1000);
                 }
             }
 
@@ -198,9 +206,10 @@ public class HTTPServer extends Thread{
 //            os.close();
             osw.close();
         }
+        filesOnHold.clear();
     }
 
-    public void ServePOSTRequest(String number, StringBuilder response) throws IOException {
+    public void ServePOSTRequest(String number, StringBuilder response) throws IOException, InterruptedException {
         System.out.println("Message received from client is " + number);
         System.out.println(" -------------------------------------------");
         System.out.println();
@@ -222,42 +231,52 @@ public class HTTPServer extends Thread{
 //            os.close();
             osw.close();
         }
-        else if(number.endsWith(":MESSAGE")){
+        else if(number.endsWith(":MESSAGE")) {
             String filename = number.substring(0, number.indexOf(":"));
-            number  = number.substring(number.indexOf(":")+1);
-            String messa = number.substring(number.indexOf(";")+1, number.indexOf(":"));
+            number = number.substring(number.indexOf(":") + 1);
+            String messa = number.substring(number.indexOf(";") + 1, number.indexOf(":"));
             System.out.println("Type 2");
-            File holder  = returnFile(filename);
-            if(holder == null){
-                createFileandWrite(filename, messa);
-                String hope= "File has been created at the server in your accessible directory with the contents" +
-                        " supplied by you";
-                if(isVerbose()){
-                    String temp = verboseContent();
-                    hope = temp + hope;
-                }
-                bw.write(hope);
-                System.out.println("Message sent to the client is 2 " + hope);
-            }
-            else{
-                if(holder.isFile()) {
-                    openFileandWrite(holder, messa);
-                    String hope= "File was found at the server in your accessible directory and has been overwritten" +
-                            " by contents supplied by you";
-                    if(isVerbose()){
-                        String temp = verboseContent();
-                        hope = temp + hope;
-                    }
-                    bw.write(hope);
-                    System.out.println("Message sent to the client is 2 " + hope);
+            File holder = returnFile(filename);
+            while (true){
+                if(!filesOnHold.contains(holder.getName())) {
+                    filesOnHold.add(holder.getName());
+                    if (holder == null) {
+                        createFileandWrite(filename, messa);
+                        String hope = "File has been created at the server in your accessible directory with the contents" +
+                                " supplied by you";
+                        if (isVerbose()) {
+                            String temp = verboseContent();
+                            hope = temp + hope;
+                        }
+                        bw.write(hope);
+                        System.out.println("Message sent to the client is 2 " + hope);
+                        filesOnHold.remove(holder.getName());
+                        break;
+                    } else {
+                        if (holder.isFile()) {
+                            openFileandWrite(holder, messa);
+                            String hope = "File was found at the server in your accessible directory and has been overwritten" +
+                                    " by contents supplied by you";
+                            if (isVerbose()) {
+                                String temp = verboseContent();
+                                hope = temp + hope;
+                            }
+                            bw.write(hope);
+                            System.out.println("Message sent to the client is 2 " + hope);
 
+                        } else {
+                            bw.write("The selected file is a directory you are not authorized access to it");
+                            System.out.println("Message sent to the client is 2 " + "The selected file is a directory you " +
+                                    "are not authorized access to it");
+                        }
+                        filesOnHold.remove(holder.getName());
+                        break;
+                    }
                 }
                 else{
-                    bw.write("The selected file is a directory you are not authorized access to it");
-                    System.out.println("Message sent to the client is 2 " + "The selected file is a directory you " +
-                            "are not authorized access to it");
+                    wait(1000);
                 }
-            }
+        }
 
             bw.flush();
 //            os.close();
@@ -269,6 +288,7 @@ public class HTTPServer extends Thread{
 //            os.close();
             osw.close();
         }
+        filesOnHold.clear();
     }
 
     public void openFileandWrite(File file, String messa) throws IOException {
